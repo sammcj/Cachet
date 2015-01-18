@@ -44,7 +44,21 @@ class Incident extends Model implements TransformableInterface, PresenterInterfa
      *
      * @var string[]
      */
-    protected $fillable = ['user_id', 'component_id', 'name', 'status', 'message'];
+    protected $fillable = [
+        'user_id',
+        'component_id',
+        'name',
+        'status',
+        'message',
+        'published_at',
+    ];
+
+    /**
+     * The attributes that should be mutated to dates.
+     *
+     * @var string[]
+     */
+    protected $dates = ['published_at'];
 
     /**
      * The accessors to append to the model's serialized form.
@@ -52,6 +66,30 @@ class Incident extends Model implements TransformableInterface, PresenterInterfa
      * @var string[]
      */
     protected $appends = ['humanStatus'];
+
+    /**
+     * Returns only scheduled incidents.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeScheduled($query)
+    {
+        return $query->whereRaw('published_at <> created_at');
+    }
+
+    /**
+     * Returns only scheduled incidents.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeUnscheduled($query)
+    {
+        return $query->whereRaw('published_at = created_at');
+    }
 
     /**
      * Get presenter class.
@@ -104,6 +142,16 @@ class Incident extends Model implements TransformableInterface, PresenterInterfa
             default:
                 return '';
         }
+    }
+
+    /**
+     * Determines if the incident is scheduled or not.
+     *
+     * @return bool
+     */
+    public function getIsScheduledAttribute()
+    {
+        return $this->published_at != $this->created_at;
     }
 
     /**

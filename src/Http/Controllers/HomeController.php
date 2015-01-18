@@ -66,13 +66,15 @@ class HomeController extends Controller
             }
         }
 
+        $scheduled = Incident::whereRaw('published_at > CURDATE()')->get();
+
         foreach (range(0, $incidentDays) as $i) {
             $date = $startDate->copy()->subDays($i);
 
             $incidents = Incident::whereBetween('created_at', [
                 $date->format('Y-m-d').' 00:00:00',
                 $date->format('Y-m-d').' 23:59:59',
-            ])->orderBy('created_at', 'desc')->get();
+            ])->whereRaw('published_at <= CURDATE()')->orderBy('created_at', 'desc')->get();
 
             $allIncidents[] = [
                 'date'      => (new Date($date->toDateString()))->format($dateFormat),
@@ -88,6 +90,7 @@ class HomeController extends Controller
             'canPageForward' => (bool) $today->gt($startDate),
             'previousDate'   => $startDate->copy()->subWeek()->subDay()->toDateString(),
             'nextDate'       => $startDate->copy()->addWeek()->addDay()->toDateString(),
+            'scheduled'      => $scheduled,
         ]);
     }
 }

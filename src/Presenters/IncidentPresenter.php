@@ -60,4 +60,14 @@ class IncidentPresenter extends BasePresenter
     {
         return $this->resource->created_at->setTimezone($this->tz)->toISO8601String();
     }
+
+    /**
+     * Present formated published date time.
+     *
+     * @return string
+     */
+    public function published_at_iso()
+    {
+        return $this->resource->published_at->toISO8601String();
+    }
 }
