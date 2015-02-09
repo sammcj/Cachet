@@ -22,7 +22,7 @@
                         </div>
                         <div class="form-group">
                             <label for="metric-suffix">{{ trans('forms.metrics.suffix') }}</label>
-                            <input type="text" class="form-control" name="metric[suffix]" id="metric-suffix" required value={{ $metric->suffix }}>
+                            <input type="text" class="form-control" name="metric[suffix]" id="metric-suffix" required value="{{ $metric->suffix }}">
                         </div>
                         <div class="form-group">
                             <label>{{ trans('forms.metrics.description') }}</label>
