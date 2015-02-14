@@ -5,6 +5,7 @@ namespace CachetHQ\Cachet\Models;
 use CachetHQ\Cachet\Transformers\MetricTransformer;
 use Dingo\Api\Transformer\TransformableInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Watson\Validating\ValidatingTrait;
 
 /**
@@ -46,6 +47,16 @@ class Metric extends Model implements TransformableInterface
     public function points()
     {
         return $this->hasMany('CachetHQ\Cachet\Models\MetricPoint', 'metric_id', 'id');
+    }
+
+    /**
+     * Returns a comma separated list of values for the charts to use.
+     *
+     * @return string
+     */
+    public function getListAttribute()
+    {
+        $points = $this->points()->whereRaw('created_at >= DATE_SUB(created_at, INTERVAL 10 HOUR)')->groupBy(DB::raw('HOUR(created_at)'))->get();
     }
 
     /**

@@ -23,30 +23,38 @@
                 </div>
             </div>
         </div>
+        {{dd($metric->list)}}
         <script>
-                var data = {
-                    labels: ["January", "February", "March", "April", "May", "June", "July"],
-                    datasets: [
-                        {
-                            fillColor: "rgba(220,220,220,0.2)",
-                            strokeColor: "rgba(220,220,220,1)",
-                            pointColor: "rgba(220,220,220,1)",
-                            pointStrokeColor: "#fff",
-                            pointHighlightFill: "#fff",
-                            pointHighlightStroke: "rgba(220,220,220,1)",
-                            data: [{{ implode(',', $metric->points->lists('value')) }}]
-                        }
-                    ]
-                };
+            var hourList = [];
+            var date = new Date();
 
-                window.onload = function() {
-                    var ctx = document.getElementById("metric-{{ $metric->id }}").getContext("2d");
-                    window.myLine = new Chart(ctx).Line(data, {
-                        scaleShowVerticalLines: false,
-                        pointDot: false,
-                        responsive: true
-                    });
-                }
+            var range = date.getHours() - 10, time;
+            for (var i = range; i >= 0; i--) {
+                hourList.push(moment(date).subtract(i, 'hours').seconds(0).format('HH:ss'));
+            }
+
+            var data = {
+                showTooltips: false,
+                labels: hourList,
+                datasets: [{
+                    fillColor: "rgba(220,220,220,0.2)",
+                    strokeColor: "rgba(220,220,220,1)",
+                    pointColor: "rgba(220,220,220,1)",
+                    pointStrokeColor: "#fff",
+                    pointHighlightFill: "#fff",
+                    pointHighlightStroke: "rgba(220,220,220,1)",
+                    data: [{{ $metric->list }}]
+                }]
+            };
+
+            window.onload = function() {
+                var ctx = document.getElementById("metric-{{ $metric->id }}").getContext("2d");
+                window.myLine = new Chart(ctx).Line(data, {
+                    scaleShowVerticalLines: false,
+                    pointDot: false,
+                    responsive: true
+                });
+            };
         </script>
     </li>
     @endforeach

@@ -11,6 +11,7 @@ use Exception;
 use GrahamCampbell\Binput\Facades\Binput;
 use GrahamCampbell\Markdown\Facades\Markdown;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
 use Jenssegers\Date\Date;
 
@@ -67,7 +68,9 @@ class HomeController extends Controller
             }
         }
 
-        $metrics = Metric::where('display_chart', '=', true)->get();
+        if (Setting::get('display_graphs')) {
+            $metrics = Metric::where('display_chart', 1)->get();
+        }
 
         foreach (range(0, $incidentDays) as $i) {
             $date = $startDate->copy()->subDays($i);
