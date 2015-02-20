@@ -1,6 +1,13 @@
 @if($metrics->count() > 0)
 <ul class="list-group metrics">
     @foreach($metrics as $metric)
+    <?php
+        $points = range(0, 10);
+        foreach($points as $hour) {
+            $points[$hour] = $metric->points()->whereRaw('DATE_FORMAT(created_at, "%Y%c%e%H") = DATE_FORMAT(DATE_SUB(NOW(), INTERVAL '.$hour.' HOUR), "%Y%c%e%H")')->whereRaw('HOUR(created_at) = HOUR(DATE_SUB(NOW(), INTERVAL '.$hour.' HOUR))')->groupBy(Illuminate\Support\Facades\DB::raw('HOUR(created_at)'))->sum('value');
+        }
+        $points = array_reverse($points);
+    ?>
     <li class="list-group-item metric">
         <div class="row">
             <div class="col-xs-10">
@@ -23,13 +30,11 @@
                 </div>
             </div>
         </div>
-        {{dd($metric->list)}}
         <script>
             var hourList = [];
             var date = new Date();
 
-            var range = date.getHours() - 10, time;
-            for (var i = range; i >= 0; i--) {
+            for (var i = 10; i >= 1; i--) {
                 hourList.push(moment(date).subtract(i, 'hours').seconds(0).format('HH:ss'));
             }
 
@@ -43,7 +48,7 @@
                     pointStrokeColor: "#fff",
                     pointHighlightFill: "#fff",
                     pointHighlightStroke: "rgba(220,220,220,1)",
-                    data: [{{ $metric->list }}]
+                    data: [{{ implode(',', $points) }}]
                 }]
             };
 

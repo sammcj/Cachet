@@ -50,16 +50,6 @@ class Metric extends Model implements TransformableInterface
     }
 
     /**
-     * Returns a comma separated list of values for the charts to use.
-     *
-     * @return string
-     */
-    public function getListAttribute()
-    {
-        $points = $this->points()->whereRaw('created_at >= DATE_SUB(created_at, INTERVAL 10 HOUR)')->groupBy(DB::raw('HOUR(created_at)'))->get();
-    }
-
-    /**
      * Determines whether a chart should be shown.
      *
      * @return bool
